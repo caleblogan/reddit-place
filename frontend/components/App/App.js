@@ -5,6 +5,7 @@ import Papa from 'papaparse';
 
 import styles from './App.scss';
 import PixelCanvas from "../PixelCanvas/PixelCanvas"
+import Camera from "../Camera/Camera"
 
 class App extends Component {
   constructor(props) {
@@ -31,8 +32,8 @@ class App extends Component {
       for (let i = 0; i < 1000; ++i) {
         pixels.push(new Array(1000).fill(null))
       }
-      // Papa.parse('http://localhost:8080/tile_placements_unhashed.csv', {
-      Papa.parse('http://localhost:8080/tile_test.csv', {
+      Papa.parse('http://localhost:8080/tile_placements_unhashed.csv', {
+      // Papa.parse('http://localhost:8080/tile_test.csv', {
         download: true,
         step: function(stepData) {
           let line = stepData.data[0];
@@ -69,7 +70,12 @@ class App extends Component {
   render() {
     return (
       <div>
-        <PixelCanvas data={this.getPixelData()}/>
+        <div className={styles.pixelInfo}>
+          Info
+        </div>
+        <Camera width={'100%'} height={'100%'}>
+          <PixelCanvas onMouseMove={this.handleMouseMove} data={this.getPixelData()}/>
+        </Camera>
       </div>
     );
   }

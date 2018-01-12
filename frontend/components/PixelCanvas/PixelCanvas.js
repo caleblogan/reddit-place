@@ -26,16 +26,9 @@ class PixelCanvas extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      zoomLevel: 0,
-      dragging: false,
     }
     this.canvas = null;
     this.ctx = null;
-    this.minZoom = 0;
-    this.maxZoom = 10;
-
-    this.handleMouseDown = this.handleMouseDown.bind(this);
-    this.handleMouseUp = this.handleMouseUp.bind(this);
   }
 
   componentDidUpdate() {
@@ -50,20 +43,14 @@ class PixelCanvas extends Component {
     this.ctx.fillRect(x, y, 1, 1)
   }
 
-  // Use nearest neighbour zoom
-  zoom() {
-    if (this.state.zoomLevel <= this.minZoom || this.state.zoomLevel >= this.maxZoom) {
-      return;
-    }
-    this.setState(prevState => ({zoomLevel: prevState.zoomLevel + 1}))
-
-  }
-
-  pan() {
-
-  }
-
   drawPixels() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.ctx.save();
+    this.ctx.translate(this.props.xOffset, this.props.yOffset);
+    let scale = this.props.scale;
+    this.ctx.scale(scale, scale);
+
+    // TODO: Update drawing. Its very slow
     let pixels = this.props.data;
     for (let row = 0; row < pixels.length; ++row) {
       for (let col = 0; col < pixels[0].length; ++col) {
@@ -72,6 +59,7 @@ class PixelCanvas extends Component {
         }
       }
     }
+    this.ctx.restore();
   }
 
   setRef(canvas) {
@@ -80,23 +68,28 @@ class PixelCanvas extends Component {
       this.ctx = canvas.getContext('2d');
     }
   }
-  
-  handleMouseDown(e) {
-    console.log('mouse down');
+
+  getCoordsFromEvent(e) {
+    let {x: offsetX, y: offsetY} = e.target.getBoundingClientRect();
+    let x = e.clientX - offsetX;
+    let y = e.clientY - offsetY;
+    return {x, y}
   }
-  
-  handleMouseUp(e) {
-    console.log('mouse up')
+
+  get width() {
+    return this.props.width || 1200;
+  }
+
+  get height() {
+    return this.props.height || 1200;
   }
 
   render() {
     return (
       <canvas
         id='canvas' className={styles.canvas}
-        width={1000} height={1000}
+        width={this.width} height={this.height}
         ref={this.setRef.bind(this)}
-        onMouseDown={this.handleMouseDown}
-        onMouseUp={this.handleMouseUp}
       >
       </canvas>
     );

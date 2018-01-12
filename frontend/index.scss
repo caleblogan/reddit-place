@@ -1,0 +1,22 @@
+html, body {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.canvas {
+  margin: 10px auto;
+  display: block;
+}
+
+.infoBox {
+  position: fixed;
+  background: rgba(255, 255, 255, .8);
+  top: 0;
+  left: 0;
+  z-index: 200;
+  width: 300px;
+  height: 200px;
+  border: 1px solid black;
+  padding: 20px;
+}

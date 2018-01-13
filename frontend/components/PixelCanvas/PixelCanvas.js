@@ -6,12 +6,9 @@ import styles from './PixelCanvas.scss';
 class PixelCanvas extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      imageData: null,
-    }
     this.canvas = null;
     this.ctx = null;
-
+    let i;
     this.handleMouseMove = this.handleMouseMove.bind(this);
   }
 
@@ -28,8 +25,6 @@ class PixelCanvas extends Component {
     if (this.props.imageData) {
       this.drawPixels();
     }
-
-    console.log('updated:', this.props);
   }
 
   fillPixel(x, y, color) {
@@ -38,16 +33,8 @@ class PixelCanvas extends Component {
   }
 
   drawPixels() {
-    console.log('drawing')
     this.ctx.clearRect(0, 0, this.width, this.height);
-    // this.ctx.save();
-    // this.ctx.translate(this.props.xOffset, this.props.yOffset);
-    let scale = this.props.scale;
-    // this.ctx.scale(scale, scale);
-
-    // TODO: Update drawing. Its very slow
     this.ctx.putImageData(this.getImageData(), this.props.xOffset, this.props.yOffset);
-    // this.ctx.restore();
   }
 
   getImageData() {
@@ -99,13 +86,12 @@ class PixelCanvas extends Component {
   handleMouseMove(e) {
     let {x, y} = this.getCoordsFromEvent(e);
     let scale = this.props.scale;
-    x = Math.floor(x / scale - this.props.xOffset / scale);
-    y = Math.floor(y / scale - this.props.yOffset / scale);
+    x = Math.floor(x / scale - this.props.xOffset);
+    y = Math.floor(y / scale - this.props.yOffset);
     x = this.clampX(x);
     y = this.clampY(y);
     if (this.props.imageData) {
-      // TODO: send x and y offset to cb
-      // this.props.onMouseMove(this.props.imageData.data[y * + x]);
+      this.props.onMouseMove(x, y);
     }
   }
 

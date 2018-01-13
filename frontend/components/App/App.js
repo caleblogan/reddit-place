@@ -43,6 +43,7 @@ class App extends Component {
   componentDidMount() {
     this.loadPlacements()
       .then(res => {
+        console.log(res);
         let pixelData = this.getPixelData(res);
         console.log(pixelData);
         this.setState({
@@ -121,15 +122,16 @@ class App extends Component {
     })
   }
 
-  updateSelectedPixel(selectedPixel) {
-    if (selectedPixel) {
+  updateSelectedPixel(x, y) {
+    console.log('selected:', x, y)
+    if (this.state.placements) {
+      let selectedPixel = this.state.placements[y][x];
       this.setState({selectedPixel})
     }
   }
 
   render() {
-    let pixel = this.state.selectedPixel;
-    let i;
+    let pixel = this.state.selectedPixel || {};
     return (
       <div>
         <div className={styles.pixelInfo + ' bg-dark'}>

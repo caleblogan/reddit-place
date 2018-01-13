@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-import Papa from 'papaparse';
+import axios from 'axios';
 
 import styles from './App.scss';
 import PixelCanvas from "../PixelCanvas/PixelCanvas"
@@ -96,30 +96,32 @@ class App extends Component {
       for (let i = 0; i < 1000; ++i) {
         pixels.push(new Array(1000).fill(null))
       }
-      Papa.parse('http://localhost:8080/tile_placements_unhashed.csv', {
-      // Papa.parse('http://localhost:8080/tile_test.csv', {
-        download: true,
-        step: function(stepData) {
-          let line = stepData.data[0];
-          let [timestamp, user_hash, x, y, color] = line;
-          x = Number.parseInt(x);
-          y = Number.parseInt(y);
-          try {
-            pixels[y][x] = {
-              timestamp: Number.parseInt(timestamp),
-              user_hash: user_hash,
-              color: COLORS[Number.parseInt(color)],
-              x: x,
-              y: y
-            };
-          } catch (e) {
+      // axios.get('http://localhost:8080/tile_placements_unhashed.json')
+      axios.get('http://true-cakes.surge.sh/tile_placements_unhashed.json')
+        .then(response => {
+          console.log(response.data[0]);
+          for (let pixel of response.data) {
+            let {timestamp, user_hash, x, y, color} = pixel;
+            x = Number.parseInt(x);
+            y = Number.parseInt(y);
+            try {
+              pixels[y][x] = {
+                timestamp: Number.parseInt(timestamp),
+                user_hash: user_hash,
+                color: COLORS[Number.parseInt(color)],
+                x: x,
+                y: y
+              };
+            } catch (e) {
+            }
           }
-        },
-        complete: function(result) {
           console.log('finished loading data');
           resolve(pixels);
-        }
-      });
+        })
+        .catch(err => {
+          console.log(err);
+          reject(err);
+        });
     })
   }
 

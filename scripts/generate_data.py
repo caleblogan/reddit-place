@@ -3,6 +3,7 @@ import csv
 import hashlib
 import base64
 import sqlite3
+import json
 
 import os
 
@@ -100,6 +101,22 @@ def tile_placements_unhashed(user_hashes):
                 writer.writerow(line)
 
 
+def csvToJson():
+    placements = []
+    with open('../data/tile_placements_unhashed.csv', 'r') as fh_in:
+        reader = csv.reader(fh_in)
+        for timestamp, user, x, y, color in reader:
+            placements.append({
+                'timestamp': timestamp,
+                'user_hash': user,
+                'x': x,
+                'y': y,
+                'color': color
+            })
+    with open('../data/tile_placements_unhashed.json', 'w') as fh_out:
+        json.dump(placements, fh_out)
+
+
 def encode_username(username):
     """encoded user name to match how reddit stores them b64(sha1)"""
     username_hash = hashlib.sha1(username.encode('utf-8'))
@@ -108,5 +125,4 @@ def encode_username(username):
 
 if __name__ == '__main__':
     print('Data Formatter')
-    user_hash_map = load_user_hashes()
-    tile_placements_unhashed(user_hash_map)
+    csvToJson()

@@ -26,9 +26,7 @@ class Camera extends Component {
   }
 
   handleMouseDown(e) {
-    console.log('mouse:', e.clientX, e.clientY);
     let i;
-    console.log('offset:', this.state.xOffset, this.state.yOffset);
     this.panning = true;
     this.panningOrigin = {
       x: e.clientX,

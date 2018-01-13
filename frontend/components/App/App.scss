@@ -1,3 +1,23 @@
 .app {
 
 }
+
+.pixelInfo {
+  padding: 15px;
+  color: white;
+  border-left: 3px solid #007BFF;
+
+  h3, p, a, div {
+    display: inline-block;
+    margin: 0;
+  }
+
+  h3, p, div {
+    margin-right: 20px;
+  }
+}
+
+.pixelColor {
+  width: 20px;
+  height: 20px;
+}

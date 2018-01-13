@@ -1,3 +1,4 @@
+import 'bootstrap/dist/css/bootstrap.css';
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
@@ -7,18 +8,40 @@ import styles from './App.scss';
 import PixelCanvas from "../PixelCanvas/PixelCanvas"
 import Camera from "../Camera/Camera"
 
+
+const COLORS = [
+  '#FFFFFF', // white
+  '#E4E4E4', // light grey
+  '#888888', // grey
+  '#222222', // black
+  '#FFA7D1', // pink
+  '#E50000', // red
+  '#E59500', // orange
+  '#A06A42', // brown
+  '#E5D900', // yellow
+  '#94E044', // lime
+  '#02BE01', // green
+  '#00D3DD', // cyan
+  '#0083C7', // blue
+  '#0000EA', // dark blue
+  '#CF6EE4', // magenta
+  '#820080', // purple
+];
+
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       placements: null,
+      selectedPixel: {},
     };
+    this.updateSelectedPixel = this.updateSelectedPixel.bind(this);
   }
 
   componentDidMount() {
     this.loadPlacements()
       .then(res => {
-        this.setState({placements: res})
+        this.setState({placements: res, selectedPixel: res[2][400]});
       })
   }
 
@@ -42,9 +65,9 @@ class App extends Component {
           y = Number.parseInt(y);
           try {
             pixels[y][x] = {
-              timestamp: timestamp,
+              timestamp: Number.parseInt(timestamp),
               user_hash: user_hash,
-              color: Number.parseInt(color),
+              color: COLORS[Number.parseInt(color)],
               x: x,
               y: y
             };
@@ -67,14 +90,25 @@ class App extends Component {
     return this.state.placements;
   }
 
+  updateSelectedPixel(selectedPixel) {
+    if (selectedPixel) {
+      this.setState({selectedPixel})
+    }
+  }
+
   render() {
+    let pixel = this.state.selectedPixel;
+    let i;
     return (
       <div>
-        <div className={styles.pixelInfo}>
-          Info
+        <div className={styles.pixelInfo + ' bg-dark'}>
+          <h3 className=''>Selected: </h3>
+          <p>{pixel.timestamp ? new Date(pixel.timestamp).toLocaleString() : 'Invalid Date'}</p>
+          <a href={'https://www.reddit.com/user/'+pixel.user_hash}><p>{pixel.user_hash}</p></a>
+          <div className={styles.pixelColor} style={{backgroundColor: pixel.color}}/>
         </div>
         <Camera width={'100%'} height={'100%'}>
-          <PixelCanvas onMouseMove={this.handleMouseMove} data={this.getPixelData()}/>
+          <PixelCanvas onMouseMove={this.updateSelectedPixel} data={this.getPixelData()}/>
         </Camera>
       </div>
     );

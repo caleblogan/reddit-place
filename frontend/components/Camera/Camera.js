@@ -45,7 +45,6 @@ class Camera extends Component {
 
   handleMouseMove(e) {
     let i;
-    console.log('panning:', this.panning);
     if (this.panning) {
       let x = e.clientX - this.panningOrigin.x + this.panningOrigin.startOffsetX;
       let y = e.clientY - this.panningOrigin.y + this.panningOrigin.startOffsetY;

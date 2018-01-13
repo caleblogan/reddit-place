@@ -3,24 +3,6 @@ import PropTypes from 'prop-types';
 
 import styles from './PixelCanvas.scss';
 
-const COLORS = [
-  '#FFFFFF', // white
-  '#E4E4E4', // light grey
-  '#888888', // grey
-  '#222222', // black
-  '#FFA7D1', // pink
-  '#E50000', // red
-  '#E59500', // orange
-  '#A06A42', // brown
-  '#E5D900', // yellow
-  '#94E044', // lime
-  '#02BE01', // green
-  '#00D3DD', // cyan
-  '#0083C7', // blue
-  '#0000EA', // dark blue
-  '#CF6EE4', // magenta
-  '#820080', // purple
-];
 
 class PixelCanvas extends Component {
   constructor(props) {
@@ -29,21 +11,33 @@ class PixelCanvas extends Component {
     }
     this.canvas = null;
     this.ctx = null;
+
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      !this.props.data ||
+      this.props.scale != nextProps.scale ||
+      this.props.xOffset != nextProps.xOffset ||
+      this.props.yOffset != nextProps.yOffset
+    );
   }
 
   componentDidUpdate() {
     if (this.props.data) {
       this.drawPixels();
     }
+
     console.log('updated:', this.props);
   }
 
   fillPixel(x, y, color) {
-    this.ctx.fillStyle = COLORS[color];
+    this.ctx.fillStyle = color;
     this.ctx.fillRect(x, y, 1, 1)
   }
 
-  drawPixels() {
+  drawPixels(data) {
     this.ctx.clearRect(0, 0, this.width, this.height);
     this.ctx.save();
     this.ctx.translate(this.props.xOffset, this.props.yOffset);
@@ -76,6 +70,26 @@ class PixelCanvas extends Component {
     return {x, y}
   }
 
+  clampX(x) {
+    if (x < 0) {
+      return 0
+    }
+    if (x > this.width - 1) {
+      return this.width - 1
+    }
+    return x
+  }
+
+  clampY(y) {
+    if (y < 0) {
+      return 0;
+    }
+    if (y > this.height - 1) {
+      return this.height - 1;
+    }
+    return y;
+  }
+
   get width() {
     return this.props.width || 1200;
   }
@@ -84,12 +98,25 @@ class PixelCanvas extends Component {
     return this.props.height || 1200;
   }
 
+  handleMouseMove(e) {
+    let {x, y} = this.getCoordsFromEvent(e);
+    let scale = this.props.scale;
+    x = Math.floor(x / scale - this.props.xOffset / scale);
+    y = Math.floor(y / scale - this.props.yOffset / scale);
+    x = this.clampX(x);
+    y = this.clampY(y);
+    if (this.props.data) {
+      this.props.onMouseMove(this.props.data[y][x]);
+    }
+  }
+
   render() {
     return (
       <canvas
         id='canvas' className={styles.canvas}
         width={this.width} height={this.height}
         ref={this.setRef.bind(this)}
+        onMouseMove={this.handleMouseMove}
       >
       </canvas>
     );

@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
 
 import styles from './PixelCanvas.scss';
 
@@ -8,6 +7,7 @@ class PixelCanvas extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      imageData: null,
     }
     this.canvas = null;
     this.ctx = null;
@@ -25,7 +25,7 @@ class PixelCanvas extends Component {
   }
 
   componentDidUpdate() {
-    if (this.props.data) {
+    if (this.props.imageData) {
       this.drawPixels();
     }
 
@@ -37,23 +37,21 @@ class PixelCanvas extends Component {
     this.ctx.fillRect(x, y, 1, 1)
   }
 
-  drawPixels(data) {
+  drawPixels() {
+    console.log('drawing')
     this.ctx.clearRect(0, 0, this.width, this.height);
-    this.ctx.save();
-    this.ctx.translate(this.props.xOffset, this.props.yOffset);
+    // this.ctx.save();
+    // this.ctx.translate(this.props.xOffset, this.props.yOffset);
     let scale = this.props.scale;
-    this.ctx.scale(scale, scale);
+    // this.ctx.scale(scale, scale);
 
     // TODO: Update drawing. Its very slow
-    let pixels = this.props.data;
-    for (let row = 0; row < pixels.length; ++row) {
-      for (let col = 0; col < pixels[0].length; ++col) {
-        if (pixels[row][col] !== null) {
-          this.fillPixel(col, row, pixels[row][col].color)
-        }
-      }
-    }
-    this.ctx.restore();
+    this.ctx.putImageData(this.getImageData(), this.props.xOffset, this.props.yOffset);
+    // this.ctx.restore();
+  }
+
+  getImageData() {
+    return this.props.imageData;
   }
 
   setRef(canvas) {
@@ -105,15 +103,20 @@ class PixelCanvas extends Component {
     y = Math.floor(y / scale - this.props.yOffset / scale);
     x = this.clampX(x);
     y = this.clampY(y);
-    if (this.props.data) {
-      this.props.onMouseMove(this.props.data[y][x]);
+    if (this.props.imageData) {
+      // TODO: send x and y offset to cb
+      // this.props.onMouseMove(this.props.imageData.data[y * + x]);
     }
   }
 
   render() {
+    let dynamicStyles = {
+      'transform': `scale(${this.props.scale})`
+    };
     return (
       <canvas
         id='canvas' className={styles.canvas}
+        style={dynamicStyles}
         width={this.width} height={this.height}
         ref={this.setRef.bind(this)}
         onMouseMove={this.handleMouseMove}

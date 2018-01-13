@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
 import Papa from 'papaparse';
@@ -34,6 +35,7 @@ class App extends Component {
     this.state = {
       placements: null,
       selectedPixel: {},
+      pixelData: null
     };
     this.updateSelectedPixel = this.updateSelectedPixel.bind(this);
   }
@@ -41,8 +43,45 @@ class App extends Component {
   componentDidMount() {
     this.loadPlacements()
       .then(res => {
-        this.setState({placements: res, selectedPixel: res[2][400]});
+        let pixelData = this.getPixelData(res);
+        console.log(pixelData);
+        this.setState({
+          placements: res,
+          selectedPixel: res[2][400],
+          pixelData
+        });
       })
+  }
+
+  /**
+   * Gets Pixel data in the format of ImageData which is a Uint8ClampedArray in RGBA format
+   * @param placements
+   */
+  getPixelData(placements) {
+    let height = placements.length;
+    let width = placements[0].length;
+    let imgDataArray = new Uint8ClampedArray(width * height * 4);
+    for (let row = 0; row < height; ++row) {
+      for (let col = 0; col < width; ++col) {
+        let {r, g, b} = placements[row][col] ? this.rgbFromHexStr(placements[row][col].color) : {r: 0, g: 0, b: 0};
+        let offset = row * (width * 4) + col * 4;
+        imgDataArray[offset] = r;
+        imgDataArray[offset+1] = g;
+        imgDataArray[offset+2] = b;
+        imgDataArray[offset+3] = 255;  // Alpha
+      }
+    }
+    return new ImageData(imgDataArray, width, height)
+  }
+
+  rgbFromHexStr(hexStr) {
+    if (!hexStr) {
+      return {r: 0, g: 0, b: 0};
+    }
+    let r = Number.parseInt(hexStr.substr(1, 2), 16);
+    let g = Number.parseInt(hexStr.substr(3, 2), 16);
+    let b = Number.parseInt(hexStr.substr(5, 2), 16);
+    return {r, g, b}
   }
 
   /**
@@ -55,8 +94,8 @@ class App extends Component {
       for (let i = 0; i < 1000; ++i) {
         pixels.push(new Array(1000).fill(null))
       }
-      Papa.parse('http://localhost:8080/tile_placements_unhashed.csv', {
-      // Papa.parse('http://localhost:8080/tile_test.csv', {
+      // Papa.parse('http://localhost:8080/tile_placements_unhashed.csv', {
+      Papa.parse('http://localhost:8080/tile_test.csv', {
         download: true,
         step: function(stepData) {
           let line = stepData.data[0];
@@ -82,14 +121,6 @@ class App extends Component {
     })
   }
 
-  /**
-   * Gets the pixel data in a multidimensional array ready for the canvas
-   * @returns {*}
-   */
-  getPixelData() {
-    return this.state.placements;
-  }
-
   updateSelectedPixel(selectedPixel) {
     if (selectedPixel) {
       this.setState({selectedPixel})
@@ -107,8 +138,8 @@ class App extends Component {
           <a href={'https://www.reddit.com/user/'+pixel.user_hash}><p>{pixel.user_hash}</p></a>
           <div className={styles.pixelColor} style={{backgroundColor: pixel.color}}/>
         </div>
-        <Camera width={'100%'} height={'100%'}>
-          <PixelCanvas onMouseMove={this.updateSelectedPixel} data={this.getPixelData()}/>
+        <Camera ref={camera => this.camera = camera} width={'100%'} height={'1000px'}>
+          <PixelCanvas onMouseMove={this.updateSelectedPixel} imageData={this.state.pixelData}/>
         </Camera>
       </div>
     );

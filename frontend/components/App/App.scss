@@ -3,6 +3,12 @@
 }
 
 .pixelInfo {
+  position: fixed;
+  display: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 200;
   padding: 15px;
   color: white;
   border-left: 3px solid #007BFF;

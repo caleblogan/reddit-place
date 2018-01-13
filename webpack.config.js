@@ -56,10 +56,10 @@ const config = {
     new HtmlWebpackPlugin({
       title: 'Block Place',
     }),
-    // new HtmlWebpackPlugin({
-    //   title: 'Web3',
-    //   filename: '200.html',
-    // }),
+    new HtmlWebpackPlugin({
+      title: 'Block Place',
+      filename: '200.html',
+    }),
   ]
 };
 

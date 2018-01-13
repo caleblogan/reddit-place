@@ -5,7 +5,7 @@
   "main": "frontend/index.js",
   "scripts": {
     "test": "node_modules/.bin/jest",
-    "start": "node_modules/.bin/webpack-dev-server --content-base dist --hot",
+    "start": "node_modules/.bin/webpack-dev-server --content-base dist --hot --host 0.0.0.0",
     "build": "node_modules/.bin/webpack"
   },
   "author": "Caleb Logan",

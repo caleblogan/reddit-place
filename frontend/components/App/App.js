@@ -35,7 +35,8 @@ class App extends Component {
     this.state = {
       placements: null,
       selectedPixel: {},
-      pixelData: null
+      pixelData: null,
+      isLoading: true
     };
     this.updateSelectedPixel = this.updateSelectedPixel.bind(this);
   }
@@ -43,14 +44,13 @@ class App extends Component {
   componentDidMount() {
     this.loadPlacements()
       .then(res => {
-        console.log(res);
         let pixelData = this.getPixelData(res);
-        console.log(pixelData);
         this.setState({
           placements: res,
           selectedPixel: res[2][400],
           pixelData
         });
+        this.setState({isLoading: false});
       })
   }
 
@@ -90,13 +90,14 @@ class App extends Component {
    * @returns {Promise}
    */
   loadPlacements() {
+    this.setState({isLoading: true});
     return new Promise((resolve, reject) => {
       let pixels = [];
       for (let i = 0; i < 1000; ++i) {
         pixels.push(new Array(1000).fill(null))
       }
-      // Papa.parse('http://localhost:8080/tile_placements_unhashed.csv', {
-      Papa.parse('http://localhost:8080/tile_test.csv', {
+      Papa.parse('http://localhost:8080/tile_placements_unhashed.csv', {
+      // Papa.parse('http://localhost:8080/tile_test.csv', {
         download: true,
         step: function(stepData) {
           let line = stepData.data[0];
@@ -140,9 +141,13 @@ class App extends Component {
           <a href={'https://www.reddit.com/user/'+pixel.user_hash}><p>{pixel.user_hash}</p></a>
           <div className={styles.pixelColor} style={{backgroundColor: pixel.color}}/>
         </div>
-        <Camera ref={camera => this.camera = camera} width={'100%'} height={'1000px'}>
-          <PixelCanvas onMouseMove={this.updateSelectedPixel} imageData={this.state.pixelData}/>
-        </Camera>
+        {this.state.isLoading ? (
+          <h1 className={styles.loading}>loading...</h1>
+        ) : (
+          <Camera ref={camera => this.camera = camera} width={'100%'} height={'1000px'}>
+            <PixelCanvas onMouseMove={this.updateSelectedPixel} imageData={this.state.pixelData}/>
+          </Camera>
+        )}
       </div>
     );
   }

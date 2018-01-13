@@ -22,7 +22,6 @@ class Camera extends Component {
   }
 
   handleClick(e) {
-    // this.setState(prevState => ({xOffset: prevState.xOffset + 40}));
     e.preventDefault();
   }
 

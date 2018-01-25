@@ -6,6 +6,8 @@ dump. About 3000 pixels were excluded because they contained the coordinate
 could using b64(sha1) on an incomplete list of users that participated
 in r/place.
 
+[logo]: ./dist/reddit-place-example.png "reddit place"
+
 # Demo
 The data file is 35Mb so it will take a while to load.
 http://true-cakes.surge.sh/

@@ -21,17 +21,12 @@
   margin-top: 300px;
   width: 100%;
   text-align: center; }
-.PixelCanvas__canvas__3RFuj {
+.PixelCanvas__Canvas__14wr8 {
   margin: 0;
   padding: 0;
-  -webkit-transform: scale(1);
-          transform: scale(1);
-  -webkit-transform-origin: 0 0;
-          transform-origin: 0 0;
-  -ms-interpolation-mode: nearest-neighbor;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: -moz-crisp-edges;
-      image-rendering: pixelated; }
+  transform: scale(1);
+  transform-origin: 0 0;
+  image-rendering: pixelated; }
 .Camera__camera__2YGaE {
   padding: 0;
   overflow: hidden;

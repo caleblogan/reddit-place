@@ -9,6 +9,9 @@ import styles from './App.scss';
 import PixelCanvas from "../PixelCanvas/PixelCanvas"
 import Camera from "../Camera/Camera"
 
+const PLACEMENTS_URL = process.env.NODE_ENV === 'production'
+  ? 'http://reddit-place.surge.sh'
+  : 'http://localhost:8080';
 
 const COLORS = [
   '#FFFFFF', // white
@@ -39,6 +42,7 @@ class App extends Component {
       isLoading: true
     };
     this.updateSelectedPixel = this.updateSelectedPixel.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount() {
@@ -96,8 +100,7 @@ class App extends Component {
       for (let i = 0; i < 1000; ++i) {
         pixels.push(new Array(1000).fill(null))
       }
-      // axios.get('http://localhost:8080/tile_placements_unhashed.json')
-      axios.get('http://true-cakes.surge.sh/tile_placements_unhashed.json')
+      axios.get(`${PLACEMENTS_URL}/tile_placements_unhashed.json`)
         .then(response => {
           console.log(response.data[0]);
           for (let pixel of response.data) {
@@ -126,10 +129,17 @@ class App extends Component {
   }
 
   updateSelectedPixel(x, y) {
-    console.log('selected:', x, y)
     if (this.state.placements) {
       let selectedPixel = this.state.placements[y][x];
       this.setState({selectedPixel})
+    }
+  }
+
+  handleClick(event) {
+    console.log('ctr:', event.ctrlKey);
+    let pixel = this.state.selectedPixel || {};
+    if (event.ctrlKey) {
+      window.open(`https://www.reddit.com/user/${pixel.user_hash}`, '_blank');
     }
   }
 
@@ -139,15 +149,19 @@ class App extends Component {
       <div>
         <div className={styles.pixelInfo + ' bg-dark'}>
           <h3 className=''>Selected: </h3>
-          <p>{pixel.timestamp ? new Date(pixel.timestamp).toLocaleString() : 'Invalid Date'}</p>
+          <p>{pixel.timestamp ? new Date(pixel.timestamp).toLocaleString() : ''}</p>
           <a href={'https://www.reddit.com/user/'+pixel.user_hash}><p>{pixel.user_hash}</p></a>
           <div className={styles.pixelColor} style={{backgroundColor: pixel.color}}/>
+          <p style={{float: 'right'}}>CTRL+click to open profile</p>
         </div>
         {this.state.isLoading ? (
-          <h1 className={styles.loading}>loading...</h1>
+          <div>
+          <h1 className={styles.loading}>loading data...</h1>
+          <p style={{textAlign: 'center'}}>This might take awhile. File is large 17Mb.</p>
+          </div>
         ) : (
           <Camera ref={camera => this.camera = camera} width={'100%'} height={'1000px'}>
-            <PixelCanvas onMouseMove={this.updateSelectedPixel} imageData={this.state.pixelData}/>
+            <PixelCanvas onMouseMove={this.updateSelectedPixel} imageData={this.state.pixelData} onClick={this.handleClick}/>
           </Camera>
         )}
       </div>

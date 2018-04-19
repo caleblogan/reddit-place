@@ -101,11 +101,14 @@ class PixelCanvas extends Component {
     };
     return (
       <canvas
-        id='canvas' className={styles.canvas}
+        id='canvas'
+        className={styles.Canvas}
         style={dynamicStyles}
-        width={this.width} height={this.height}
+        width={this.width}
+        height={this.height}
         ref={this.setRef.bind(this)}
         onMouseMove={this.handleMouseMove}
+        onClick={this.props.onClick}
       >
       </canvas>
     );

@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -31,14 +32,14 @@ const config = {
         test: /^((?!\.bootstrap|bootstrap-theme).)*\.scss$/,
         use: localCss.extract({
           fallback: "style-loader",
-          use: ["css-loader?modules=true&localIdentName=[name]__[local]__[hash:base64:5]", 'postcss-loader', 'sass-loader']
+          use: ["css-loader?modules=true&localIdentName=[name]__[local]__[hash:base64:5]", 'sass-loader']
         })
       },
       {
         test: /(\.bootstrap\.css$|bootstrap-theme.css|bootstrap.css)/,
         use: globalCss.extract({
           fallback: "style-loader",
-          use: ["css-loader", 'postcss-loader', 'sass-loader']
+          use: ["css-loader", 'sass-loader']
         })
       },
       // {
@@ -59,6 +60,9 @@ const config = {
     new HtmlWebpackPlugin({
       title: 'Block Place',
       filename: '200.html',
+    }),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
     }),
   ]
 };
